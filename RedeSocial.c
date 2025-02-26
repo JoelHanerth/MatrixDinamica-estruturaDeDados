@@ -1,30 +1,30 @@
 /*
-   Simulação de uma rede social onde os usuarios podem ser registrar
+   Simulaï¿½ï¿½o de uma rede social onde os usuarios podem ser registrar
    livremente e estabelecer relacionamentos de amizades uns com os 
    outros.
    
-   Os usuários tem seus nomes armazenados em um vetor unidimensional.
+   Os usuï¿½rios tem seus nomes armazenados em um vetor unidimensional.
    
-   Os relacionamentos são registrados em uma matriz de adjacências 
+   Os relacionamentos sï¿½o registrados em uma matriz de adjacï¿½ncias 
    (como um grafo).
    
-   Assim, por exemplo, um usuário de nome "Asdrúbal" é registrado na
-   posição 0 do vetor usuarios. "Jambira" é registrada na posição 1 
+   Assim, por exemplo, um usuï¿½rio de nome "Asdrï¿½bal" ï¿½ registrado na
+   posiï¿½ï¿½o 0 do vetor usuarios. "Jambira" ï¿½ registrada na posiï¿½ï¿½o 1 
    do mesmo vetor.
    
-   A relação de amizade entre ambos é representada por um valor 1 na
-   matriz relacionamentos (linha 0 e coluna 1) e também por um valor
+   A relaï¿½ï¿½o de amizade entre ambos ï¿½ representada por um valor 1 na
+   matriz relacionamentos (linha 0 e coluna 1) e tambï¿½m por um valor
    1 na linha 1 e coluna 0.
    
-   Afinal, se Asdrúbal é amigo de Jambira também é verdade que Jambira
-   é igualmente amiga de Asdrúbal.
+   Afinal, se Asdrï¿½bal ï¿½ amigo de Jambira tambï¿½m ï¿½ verdade que Jambira
+   ï¿½ igualmente amiga de Asdrï¿½bal.
    
-   Usuário inicialmente é um vetor de 4 posições e relacionamentos é uma
+   Usuï¿½rio inicialmente ï¿½ um vetor de 4 posiï¿½ï¿½es e relacionamentos ï¿½ uma
    matriz 4 X 4.
    
-   Caso seja necessário cadastrar um quinto usuário, tanto o vetor quanto 
-   a matriz deverão ser ampliados dinâmicamente. O vetor usuário possuirá
-   5 posições e a matriz relacionamentos será de dimensão 5 x 5.
+   Caso seja necessï¿½rio cadastrar um quinto usuï¿½rio, tanto o vetor quanto 
+   a matriz deverï¿½o ser ampliados dinï¿½micamente. O vetor usuï¿½rio possuirï¿½
+   5 posiï¿½ï¿½es e a matriz relacionamentos serï¿½ de dimensï¿½o 5 x 5.
    
    20-02-2025 (quarta-feira).
    
@@ -38,16 +38,16 @@ typedef char string[20];
 typedef struct tipoCelula {
 	int valor;
 	string nome;
-	tipoCelula *abaixo;
-	tipoCelula *dir;
+	struct tipoCelula *abaixo;
+	struct tipoCelula *dir;
 }TCelula;
 
 TCelula *relacionamentos, *usuarios;
 
-//==| Assinatura das Funções |==========================
+//==| Assinatura das Funï¿½ï¿½es |==========================
 void inicializaMatriz(TCelula **c);
 void defineMatriz(TCelula **c, int linha, int coluna);
-TCelula *alocaCelula();
+TCelula *alocarCelula();
 void atualizaCelula(TCelula **c, int linha, int coluna, int valor);
 TCelula *localizaCelula(TCelula *c, int linha, int coluna);
 int obterValor(TCelula *c);
@@ -55,24 +55,9 @@ void adicionarLinha(TCelula **c);
 void adicionarColuna(TCelula **c);
 void exibeMatriz(TCelula *c);
 
-//==| Programa Principal ===============================
-int main(){
-	int opcao;
-	
-	inicializaMatriz(&relacionamentos);
-	inicializaMatriz(&usuarios);
-	
-	defineMatriz(&relacionamentos, 4, 4);
-	defineMatriz(&usuarios,4,1);
-	
-	do{
-		opcao = menu();
-			
-	}while(opcao != 0);
 
-}
 
-//===| Funções e Procedimentos |========================
+//===| Funï¿½ï¿½es e Procedimentos |========================
 void inicializaMatriz(TCelula **c){
 	*c = NULL;
 }
@@ -83,14 +68,14 @@ void defineMatriz(TCelula **c, int linha, int coluna){
 		TCelula *linhaAtual = NULL, *colunaAtual = NULL;
 		TCelula *colunaAux = NULL;
 		
-		*c = alocaCelula();
+		*c = alocarCelula();
 		linhaAtual = *c;
 		
 		for(lin=0; lin < linha; lin++){
 			colunaAtual = linhaAtual;
 			
 			for(col=1; col < coluna; col++){
-				colunaAtual->dir = alocaCelula();
+				colunaAtual->dir = alocarCelula();
 				colunaAtual = colunaAtual->dir;
 				
 				if(colunaAux != NULL)	{
@@ -103,14 +88,14 @@ void defineMatriz(TCelula **c, int linha, int coluna){
 			colunaAux = linhaAtual->dir;
 			
 			if(lin < (linha - 1)) 
-			   linhaAtual->abaixo = alocaCelula();
+			   linhaAtual->abaixo = alocarCelula();
 			
 			linhaAtual = linhaAtual->abaixo;
 		}//for
 	}//if
 }
 //=======================================================
-TCelula *alocaCelula(){
+TCelula *alocarCelula(){
 	TCelula *novo = (TCelula *)malloc(sizeof(TCelula));
 	novo->dir = NULL;
 	novo->abaixo = NULL;
@@ -171,7 +156,7 @@ void adicionarLinha(TCelula **c){
 	   ultimo = NULL;
 	   
 	   while(atual != NULL){
-	   		novo = alocaCelula();
+	   		novo = alocarCelula();
 			
 			if(ultimo != NULL){
 				ultimo->dir = novo;
@@ -205,7 +190,7 @@ void adicionarColuna(TCelula **c){
 		ultimo = NULL;
 		
 		while(atual != NULL){
-	   		novo = alocaCelula();
+	   		novo = alocarCelula();
 			
 			if(ultimo != NULL){
 				ultimo->abaixo = novo;
@@ -266,3 +251,19 @@ int menu(){
 //================================================================
 
 
+//==| Programa Principal ===============================
+int main(){
+	int opcao;
+	
+	inicializaMatriz(&relacionamentos);
+	inicializaMatriz(&usuarios);
+	
+	defineMatriz(&relacionamentos, 4, 4);
+	defineMatriz(&usuarios,4,1);
+	
+	do{
+		opcao = menu();
+			
+	}while(opcao != 0);
+
+}
