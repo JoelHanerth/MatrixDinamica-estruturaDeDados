@@ -85,7 +85,6 @@ void print_matriz(TCelula *celula) {
 
 
 int main(){
-    int op;
     inicializaMatrix(&matriz);
     defineMatriz(&matriz,3,3);
 
@@ -100,39 +99,6 @@ int main(){
     set_celula(matriz,3,0,5);
     set_celula(matriz,3,3,6);
     print_matriz(matriz);
-
-    do {
-        op = menu();
-        switch (op) {
-            case 0:
-                break;
-            case 1:
-  
-                break;
-            case 2:
-            
-                break;
-            case 3:
-              
-                break;
-            case 4:
-             
-                break;
-            case 5:
-           
-                break;
-            case 6:
-         
-                break;
-            case 7:
-
-                break;
-            default:
-                printf("\nOpção inválida!\n");
-        }
-    } while (op != 0);
-
-    return 0;
 
     return 0;
 }
