@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct tipoCelula {
 	int valor;
@@ -13,7 +14,7 @@ TCelula *usuarios;
 TCelula *relacionamentos;
 
 
-void inicializaMatrix(TCelula **celula){
+void inicializaMatriz(TCelula **celula){
     *celula = NULL;
 }
 
@@ -22,35 +23,11 @@ TCelula *alocarCelula(){
     celula->abaixo = NULL;
     celula->direito = NULL;
     celula->valor = 0;
+    celula->nome[0] = 0;
     return celula;
 }
 
 
-
-// void defineMatriz(TCelula **celula, int linha, int coluna){
-
-//     int i, j;
-//     TCelula *linhaAtual = NULL, *colunaAtual; 
-//     if (*celula == NULL){ *celula = alocaCelula(); }
-
-//     linhaAtual = *celula;
-
-//     for (i=0; i < linha; i++){
-//         colunaAtual = linhaAtual;
-
-//         for (j = 1; j < coluna; j++){
-//             if (colunaAtual->direito == NULL){ colunaAtual->direito = alocaCelula(); }
-            
-//             colunaAtual = colunaAtual->direito;
-//         }
-
-//         if (i < linha-1){
-//             if (linhaAtual->abaixo == NULL){ linhaAtual->abaixo = alocaCelula();}
-//             linhaAtual = linhaAtual->abaixo;
-//         }
-        
-//     }
-// }
 void defineMatriz(TCelula **celula, int linha, int coluna) {
     int i, j;
     TCelula *linha_atual = NULL, *coluna_atual = NULL, *coluna_acima = NULL;
@@ -100,16 +77,51 @@ TCelula *get_celula(TCelula *celula, int linha, int coluna){
     return celula;
 }
 
-void set_celula(TCelula *celula, int linha, int coluna, int valor){
+void set_int(TCelula *celula, int linha, int coluna, int valor){
     TCelula *celula_atual = get_celula (celula, linha, coluna);
     celula_atual->valor = valor;
 }
+
+void set_str(TCelula *celula, int linha, int coluna, char nome[30]){
+    TCelula *celula_atual = get_celula (celula, linha, coluna);
+    strcpy(celula_atual->nome, nome);
+}
+
+void InserirUsuario (TCelula *usuarios, TCelula *relacionamentos, int *quant){
+    char nome [30];
+
+    printf("Insira o nome de usuário: ");
+    scanf(" %29[^\n]s", nome);
+
+    (*quant)++;
+
+    defineMatriz(&usuarios,*quant,1);
+    set_str(usuarios,(*quant)-1,0,nome);
+    defineMatriz(&relacionamentos,*quant,*quant);  
+
+}
+
+
+
+
+
+void get_nomes(TCelula *celula) {
+    TCelula *celula_atual = celula;
+    int i;
+
+    for (i=1; celula_atual != NULL; i++){;
+        printf("%d - %s \n", i,celula_atual->nome);
+        celula_atual = celula_atual->abaixo;
+    }
+}
+
 
 void print_matriz(TCelula *celula) {
     TCelula *linha_atual = celula, *coluna_atual = celula;
     while (linha_atual != NULL) {
         coluna_atual = linha_atual;
         while (coluna_atual != NULL) {
+            printf("%s ", coluna_atual->nome);
             printf("%d ", coluna_atual->valor);
             coluna_atual = coluna_atual->direito;
         }
@@ -119,12 +131,26 @@ void print_matriz(TCelula *celula) {
 }
 
 
+void InserirRelacionamentos (TCelula *usuarios, TCelula *relacionamentos){
+    int num1, num2;
+
+    get_nomes(usuarios);
+    printf("Insira número do primeiro usuário para relacionameto: ");
+    scanf("%d", &num1);
+    printf("Insira número do segundo usuário para relacionameto: ");
+    scanf("%d", &num2);
+
+    set_int(relacionamentos,num1-1,num2-1,1);
+    set_int(relacionamentos,num2-1,num1-1,1);
+
+}
+
 
 
 //================================================================
 int menu(){
 	int opcao;
-	system("CLS");
+	// system("CLS");
 	printf("\n\n\n\t\t=====| MENU |======\n\n");
 	printf("\t0 - Sair (Encerrar Aplicacao).\n");
 	printf("\t1 - Inserir NOVO usuario.\n");
@@ -146,20 +172,35 @@ int menu(){
 //==| Programa Principal ===============================
 int main(){
 	int opcao;
+    int quant_usuarios = 4;
 	
 	inicializaMatriz(&relacionamentos);
 	inicializaMatriz(&usuarios);
 	
 	defineMatriz(&relacionamentos, 4, 4);
 	defineMatriz(&usuarios,4,1);
+    set_str(usuarios,0,0,"a");
+    set_str(usuarios,1,0,"b");
+    set_str(usuarios,2,0,"c");
+    set_str(usuarios,3,0,"d");
+
+    print_matriz(usuarios);
+    InserirUsuario(usuarios,relacionamentos,&quant_usuarios);
+    print_matriz(usuarios);
+
+    InserirRelacionamentos(usuarios,relacionamentos);
+    print_matriz(relacionamentos);
+
+
 
 
 	
-	do{
-		opcao = menu();
+	// do{
+	// 	opcao = menu();
 			
-	}while(opcao != 0);
+	// }while(opcao != 0);
 
+    return 0;
 }
 
 
