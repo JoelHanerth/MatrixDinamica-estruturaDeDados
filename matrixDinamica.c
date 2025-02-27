@@ -188,6 +188,7 @@ int main(){
     InserirUsuario(usuarios,relacionamentos,&quant_usuarios);
     print_matriz(usuarios);
 
+    
     InserirRelacionamentos(usuarios,relacionamentos);
     print_matriz(relacionamentos);
 
