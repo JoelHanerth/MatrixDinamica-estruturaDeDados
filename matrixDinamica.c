@@ -184,22 +184,42 @@ int main(){
     set_str(usuarios,2,0,"c");
     set_str(usuarios,3,0,"d");
 
-    print_matriz(usuarios);
-    InserirUsuario(usuarios,relacionamentos,&quant_usuarios);
-    print_matriz(usuarios);
-
-    
-    InserirRelacionamentos(usuarios,relacionamentos);
-    print_matriz(relacionamentos);
 
 
+	do{
+        print_matriz(usuarios);
+        print_matriz(relacionamentos);
+        opcao = menu();
+        switch (opcao) {
+            case 0:
+                break;
+            case 1:
+                InserirUsuario(usuarios,relacionamentos,&quant_usuarios);
 
+                break;
+            case 2:
+                InserirRelacionamentos(usuarios,relacionamentos);
+            
+                break;
+            case 3:
+                
+                break;
+            case 4:
+                
+                break;
+            case 5:
+            
+                break;
+            case 6:
+            
+                break;
+            case 7:
 
-	
-	// do{
-	// 	opcao = menu();
-			
-	// }while(opcao != 0);
+                break;
+            default:
+                printf("\nOpção inválida!\n");
+        }
+    } while (opcao != 0);			
 
     return 0;
 }
