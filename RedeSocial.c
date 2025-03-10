@@ -1,238 +1,212 @@
 /*
-   Simula��o de uma rede social onde os usuarios podem ser registrar
-   livremente e estabelecer relacionamentos de amizades uns com os 
-   outros.
-   
-   Os usu�rios tem seus nomes armazenados em um vetor unidimensional.
-   
-   Os relacionamentos s�o registrados em uma matriz de adjac�ncias 
-   (como um grafo).
-   
-   Assim, por exemplo, um usu�rio de nome "Asdr�bal" � registrado na
-   posi��o 0 do vetor usuarios. "Jambira" � registrada na posi��o 1 
-   do mesmo vetor.
-   
-   A rela��o de amizade entre ambos � representada por um valor 1 na
-   matriz relacionamentos (linha 0 e coluna 1) e tamb�m por um valor
-   1 na linha 1 e coluna 0.
-   
-   Afinal, se Asdr�bal � amigo de Jambira tamb�m � verdade que Jambira
-   � igualmente amiga de Asdr�bal.
-   
-   Usu�rio inicialmente � um vetor de 4 posi��es e relacionamentos � uma
-   matriz 4 X 4.
-   
-   Caso seja necess�rio cadastrar um quinto usu�rio, tanto o vetor quanto 
-   a matriz dever�o ser ampliados din�micamente. O vetor usu�rio possuir�
-   5 posi��es e a matriz relacionamentos ser� de dimens�o 5 x 5.
-   
-   20-02-2025 (quarta-feira).
-   
+Integrantes do projeto: Joel Hanerth e Lucas Zanetti Zanotelli
 */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-typedef char string[20];
-
+#include <windows.h>
 typedef struct tipoCelula {
 	int valor;
-	string nome;
+	char nome[30];
 	struct tipoCelula *abaixo;
-	struct tipoCelula *dir;
+	struct tipoCelula *direito;
 }TCelula;
 
-TCelula *relacionamentos, *usuarios;
 
-//==| Assinatura das Fun��es |==========================
-void inicializaMatriz(TCelula **c);
-void defineMatriz(TCelula **c, int linha, int coluna);
-TCelula *alocarCelula();
-void atualizaCelula(TCelula **c, int linha, int coluna, int valor);
-TCelula *localizaCelula(TCelula *c, int linha, int coluna);
-int obterValor(TCelula *c);
-void adicionarLinha(TCelula **c);
-void adicionarColuna(TCelula **c);
-void exibeMatriz(TCelula *c);
+TCelula *usuarios;
+TCelula *relacionamentos;
 
 
-
-//===| Fun��es e Procedimentos |========================
-void inicializaMatriz(TCelula **c){
-	*c = NULL;
+void inicializaMatriz(TCelula **celula){
+    *celula = NULL;
 }
-//======================================================
-void defineMatriz(TCelula **c, int linha, int coluna){
-	if(*c == NULL){
-		int lin,col;
-		TCelula *linhaAtual = NULL, *colunaAtual = NULL;
-		TCelula *colunaAux = NULL;
-		
-		*c = alocarCelula();
-		linhaAtual = *c;
-		
-		for(lin=0; lin < linha; lin++){
-			colunaAtual = linhaAtual;
-			
-			for(col=1; col < coluna; col++){
-				colunaAtual->dir = alocarCelula();
-				colunaAtual = colunaAtual->dir;
-				
-				if(colunaAux != NULL)	{
-					colunaAux->abaixo = colunaAtual;
-					colunaAux = colunaAux->dir;	
-				}//if
-				
-			}//for
-			
-			colunaAux = linhaAtual->dir;
-			
-			if(lin < (linha - 1)) 
-			   linhaAtual->abaixo = alocarCelula();
-			
-			linhaAtual = linhaAtual->abaixo;
-		}//for
-	}//if
+
+TCelula *get_celula(TCelula *celula, int linha, int coluna){
+    int i, j;
+
+    for (i=0; i< linha; i++){
+        celula = celula->abaixo;
+    }
+    for (j=0; j< coluna; j++){
+        celula = celula->direito;
+    }
+    return celula;
 }
-//=======================================================
+
+void SugerirAmizades(TCelula *usuarios, TCelula *relacionamentos, int quant_usuarios) {
+    int i, j, k;
+    TCelula *user_i, *user_j, *user_k, *user_kj;
+
+    for (i = 0; i < quant_usuarios; i++) {
+        user_i = get_celula(usuarios, i, 0);
+        printf("\nSugestões de amizade para %s:\n", user_i->nome);
+        int encontrouSugestao = 0; 
+
+        for (j = 0; j < quant_usuarios; j++) {
+            if (i == j) continue; 
+
+            user_j = get_celula(relacionamentos, i, j);
+            if (user_j->valor == 0) {  // Se não forem amigos ainda
+                int amigos_em_comum = 0;
+
+                for (k = 0; k < quant_usuarios; k++) {
+                    if (k != i && k != j) {
+                        user_k = get_celula(relacionamentos, i, k);
+                        user_kj = get_celula(relacionamentos, k, j);
+
+                        if (user_k->valor == 1 && user_kj->valor == 1) {
+                            amigos_em_comum++;
+                        }
+                    }
+                }
+
+                if (amigos_em_comum >= 2) {
+                    TCelula *user_sugestao = get_celula(usuarios, j, 0);
+                    printf("  - %s (amigos em comum: %d)\n", user_sugestao->nome, amigos_em_comum);
+                    encontrouSugestao = 1;
+                }
+            }
+        }
+
+        if (!encontrouSugestao) {
+            printf("  Nenhuma sugestão disponível.\n");
+        }
+    }
+}
+
+
+
+
 TCelula *alocarCelula(){
-	TCelula *novo = (TCelula *)malloc(sizeof(TCelula));
-	novo->dir = NULL;
-	novo->abaixo = NULL;
-	novo->valor = 0;
-	strcpy(novo->nome,"");
-	return novo;
+    TCelula *celula = (TCelula *)malloc(sizeof(TCelula));
+    celula->abaixo = NULL;
+    celula->direito = NULL;
+    celula->valor = 0;
+    celula->nome[0] = 0;
+    return celula;
 }
-//=======================================================
-void atualizaCelula(TCelula **c, int linha, int coluna, int valor){
-	TCelula *atual = *c;
-	int lin = 0;
-	int col = 0;
-	
-	while(lin < linha){
-		lin++;
-		atual = atual->abaixo;
-	}//while
-	
-	while(col < coluna){
-		col++;
-		atual = atual->dir;
-	}//while
-	
-	atual->valor = valor;
-}
-//===============================================================
-TCelula *localizaCelula(TCelula *c, int linha, int coluna){
-	TCelula *atual = c;
-	int lin = 0, col = 0;
-	
-	while(lin < linha){
-		atual = atual->abaixo;
-		lin++;
-	}//while
-	
-	while(col < coluna){
-		atual = atual->dir;
-		col++;
-	}//while
-	return atual;
-}
-//================================================================
-int obterValor(TCelula *c){
-	return c->valor;
-}
-//================================================================
-void adicionarLinha(TCelula **c){
-/* Acrescenta uma nova linha ao final da matriz*/
-	TCelula *atual, *novo, *ultimo;
-	
-	if((*c) != NULL){
 
-	   atual = (*c);
-	   while(atual->abaixo != NULL){
-	    	atual = atual->abaixo;
-	   }//while
-	   
-	   ultimo = NULL;
-	   
-	   while(atual != NULL){
-	   		novo = alocarCelula();
-			
-			if(ultimo != NULL){
-				ultimo->dir = novo;
-			}//if
-			
-			atual->abaixo = novo;
-			
-			ultimo = novo;
-			
-			atual = atual->dir;
-					
-	   }//while
-	   
-    }//if
-	
-	printf("\n\n\tLinha INSERIDA com SUCESSO!!!");
-	
+
+void defineMatriz(TCelula **celula, int linha, int coluna) {
+    int i, j;
+    TCelula *linha_atual = NULL, *coluna_atual = NULL, *coluna_acima = NULL;
+
+    if (*celula == NULL) {
+        *celula = alocarCelula();
+    }
+
+    linha_atual = *celula;
+
+    for (i = 0; i < linha; i++) {
+        coluna_atual = linha_atual;
+        for (j = 1; j < coluna ; j++) {
+            
+            if (coluna_atual->direito == NULL) {
+                coluna_atual->direito = alocarCelula();
+            }
+            coluna_atual = coluna_atual->direito;
+
+            if (coluna_acima != NULL) {
+                coluna_acima->abaixo = coluna_atual;
+                coluna_acima = coluna_acima->direito;             
+            }
+
+        }
+        if (i < (linha - 1)) {
+            if (linha_atual->abaixo == NULL) {
+                linha_atual->abaixo = alocarCelula();
+            }
+        }
+        coluna_acima = linha_atual->direito;
+        linha_atual = linha_atual->abaixo;
+    }
+
 }
-//================================================================
-void adicionarColuna(TCelula **c){
-/* Acrescenta uma nova coluna ao final da matriz*/
-	TCelula *atual, *novo, *ultimo;
-	
-	if((*c) != NULL){
-		atual = (*c);
-		
-		while(atual->dir != NULL){
-			atual = atual->dir;
-		}//while
-		
-		ultimo = NULL;
-		
-		while(atual != NULL){
-	   		novo = alocarCelula();
-			
-			if(ultimo != NULL){
-				ultimo->abaixo = novo;
-			}//if
-			
-			atual->dir = novo;
-			
-			ultimo = novo;
-			
-			atual = atual->abaixo;
-			
-		}//while
-		
-    }//if
+
+
+
+void set_int(TCelula *celula, int linha, int coluna, int valor){
+    TCelula *celula_atual = get_celula (celula, linha, coluna);
+    celula_atual->valor = valor;
+}
+
+void set_str(TCelula *celula, int linha, int coluna, char nome[30]){
+    TCelula *celula_atual = get_celula (celula, linha, coluna);
+    strcpy(celula_atual->nome, nome);
+}
+
+void InserirUsuario (TCelula *usuarios, TCelula *relacionamentos, int *quant){
+    char nome [30];
+
+    printf("Insira o nome de usuário: ");
+    scanf(" %29[^\n]s", nome);
+
+    (*quant)++;
+
+    defineMatriz(&usuarios,*quant,1);
+    set_str(usuarios,(*quant)-1,0,nome);
+    defineMatriz(&relacionamentos,*quant,*quant);  
+
+}
+
+
+void get_nomes(TCelula *celula) {
+    TCelula *celula_atual = celula;
+    int i;
+
+    for (i=1; celula_atual != NULL; i++){;
+        printf("%d - %s \n", i,celula_atual->nome);
+        celula_atual = celula_atual->abaixo;
+    }
+}
+
+
+void print_matriz(TCelula *celula) {
+    TCelula *linha_atual = celula, *coluna_atual = celula;
+    while (linha_atual != NULL) {
+        coluna_atual = linha_atual;
+        while (coluna_atual != NULL) {
+            printf("%s ", coluna_atual->nome);
+            printf("%d ", coluna_atual->valor);
+            coluna_atual = coluna_atual->direito;
+        }
+        printf("\n");
+        linha_atual = linha_atual->abaixo;
+    }
+}
+
+
+void InserirRelacionamentos(TCelula *usuarios, TCelula *relacionamentos, int *quant) {
+    int num1, num2;     
+
+    get_nomes(usuarios);
     
-    printf("\n\n\tColuna INSERIDA com SUCESSO!!!");
+    printf("Insira número do primeiro usuário para relacionamento: ");
+    scanf("%d", &num1);
+    while (num1 <= 0 || num1 > *quant) {
+        printf("Número inválido. Insira novamente: ");
+        scanf("%d", &num1);
+    }
+    
+    printf("Insira número do segundo usuário para relacionamento: ");
+    scanf("%d", &num2);
+    while (num2 <= 0 || num2 > *quant || num2 == num1) {
+        printf("Número inválido. Insira novamente: ");
+        scanf("%d", &num2);
+    }
+
+    set_int(relacionamentos,num1-1,num2-1,1);
+    set_int(relacionamentos,num2-1,num1-1,1);
+
 }
-//================================================================
-void exibeMatriz(TCelula *c){
-	system("CLS");
-	printf("\n\n\n\t\t=====| EXIBE MATRIZ |=====\n\n");
-	
-	TCelula *atual;
-	TCelula *proxima = c;
-	
-	while(proxima != NULL){
-		atual = proxima;
-		while (atual != NULL)	{
-			printf("  %d", atual->valor);
-			atual = atual->dir;
-		}//while
-		printf("\n");
-		proxima = proxima->abaixo;
-	}//while
-	
-	printf("\n\n");
-	system("PAUSE");
-}
+
+
+
 //================================================================
 int menu(){
 	int opcao;
-	system("CLS");
+	// system("CLS");
 	printf("\n\n\n\t\t=====| MENU |======\n\n");
 	printf("\t0 - Sair (Encerrar Aplicacao).\n");
 	printf("\t1 - Inserir NOVO usuario.\n");
@@ -253,17 +227,48 @@ int menu(){
 
 //==| Programa Principal ===============================
 int main(){
+    SetConsoleOutputCP(65001);
 	int opcao;
+    int quant_usuarios = 4;
 	
 	inicializaMatriz(&relacionamentos);
 	inicializaMatriz(&usuarios);
 	
 	defineMatriz(&relacionamentos, 4, 4);
 	defineMatriz(&usuarios,4,1);
-	
-	do{
-		opcao = menu();
-			
-	}while(opcao != 0);
+    set_str(usuarios,0,0,"Anna");
+    set_str(usuarios,1,0,"Beatriz");
+    set_str(usuarios,2,0,"Carlos");
+    set_str(usuarios,3,0,"Daniel");
 
+
+
+	do{
+        get_nomes(usuarios);
+        printf("\n");
+        print_matriz(relacionamentos);
+        opcao = menu();
+        switch (opcao) {
+            case 0:
+                break;
+            case 1:
+                InserirUsuario(usuarios,relacionamentos,&quant_usuarios);
+
+                break;
+            case 2:
+                InserirRelacionamentos(usuarios,relacionamentos, &quant_usuarios);
+            
+                break;
+            case 3:
+                SugerirAmizades(usuarios, relacionamentos, quant_usuarios);
+                break;
+
+            default:
+                printf("\nOpção inválida!\n");
+        }
+    } while (opcao != 0);			
+
+    return 0;
 }
+
+
